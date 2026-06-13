@@ -2,6 +2,10 @@ import * as readline from 'readline-sync';
 import { leerDB, guardarDB, limpiarDB } from './database/db.simulada';
 import type { Incidente } from './models/incidente.model';
 
+/**
+ * Funcion auxiliar para asegurar que el usuario ingrese datos obligatorios.
+ * Evita strings vacios o solo con espacios.
+ */
 function leerTextoValidado(pregunta: string): string {
     let entrada = "";
     while (entrada.trim() === "") {
@@ -13,6 +17,10 @@ function leerTextoValidado(pregunta: string): string {
     return entrada;
 }
 
+/**
+ * Nucleo del programa: mantiene la aplicacion corriendo en un bucle infinito
+ * hasta que el usuario elige la opcion de salir.
+ */
 function menuPrincipal(): void {
     while (true) {
         console.log("\n=== SISTEMA DE TALLER ===");
@@ -21,14 +29,15 @@ function menuPrincipal(): void {
         console.log("[3] Listar registros");
         console.log("[4] Actualizar estado");
         
+        // Limita la entrada del usuario solo a los numeros del 1 al 4
         const tecla = readline.keyIn("Selecciona una opcion [1-4]: ", {limit: '1234'});
-        const db = leerDB();
+        const db = leerDB(); // Carga la base de datos fresca en cada iteracion
 
         switch (tecla) {
             case '1':
                 limpiarDB();
                 console.log("Sistema cerrado. Base de datos vaciada.");
-                process.exit(0);
+                process.exit(0); // Termina la ejecucion del proceso
             case '2':
                 crearReporte(db);
                 break;
@@ -42,6 +51,10 @@ function menuPrincipal(): void {
     }
 }
 
+/**
+ * Recorre la base de datos y muestra los detalles de cada incidente.
+ * Incluye validacion para cuando no existen registros.
+ */
 function mostrarReportes(db: Incidente[]): void {
     if (db.length === 0) return console.log("Advertencia: No hay registros para mostrar.");
     
@@ -60,6 +73,9 @@ function mostrarReportes(db: Incidente[]): void {
     });
 }
 
+/**
+ * Crea un nuevo objeto Incidente y lo persiste en la base de datos.
+ */
 function crearReporte(db: Incidente[]): void {
     console.log("\n--- GENERAR NUEVO REPORTE ---");
     const titulo = leerTextoValidado("Titulo: ");
@@ -75,6 +91,7 @@ function crearReporte(db: Incidente[]): void {
     const prioridades = ['baja', 'media', 'alta'];
     const pIdx = parseInt(tecla) - 1;
 
+    // Crea el objeto con los datos capturados y estado inicial 'abierto'
     const nuevo: Incidente = {
         id: db.length + 1,
         titulo,
@@ -86,27 +103,30 @@ function crearReporte(db: Incidente[]): void {
     };
     
     db.push(nuevo);
-    guardarDB(db);
+    guardarDB(db); // Persiste el nuevo registro
     console.log("\nRegistro guardado con ID: " + nuevo.id);
 }
 
+/**
+ * Permite buscar un reporte por ID y modificar su estado.
+ * Incluye manejo de errores para IDs inexistentes o entradas invalidas.
+ */
 function actualizarEstado(db: Incidente[]): void {
     if (db.length === 0) return console.log("Advertencia: No hay registros.");
     
     let reporte: Incidente | undefined;
     
-    // Bucle para controlar la busqueda del ID
+    // Bucle de busqueda: fuerza al usuario a ingresar un ID valido o salir
     while (!reporte) {
         const input = readline.question("Ingresa el ID numerico del reporte (o escribe '0' para volver al menu): ");
         
-        // Si el usuario escribe 0, salimos de la funcion
-        if (input === '0') return;
+        if (input === '0') return; // Punto de retorno seguro
 
         const id = parseInt(input);
         
         if (isNaN(id)) {
             console.log("Advertencia: Debes ingresar un numero valido.");
-            continue; // Volver a preguntar
+            continue; 
         }
 
         reporte = db.find(r => r.id === id);
@@ -116,7 +136,6 @@ function actualizarEstado(db: Incidente[]): void {
         }
     }
 
-    // Si llegamos aqui, significa que encontramos el reporte
     console.log("\nEstado actual: " + reporte.estado.toUpperCase());
     console.log("Selecciona nuevo estado:");
     console.log("[1] Abierto");
@@ -127,8 +146,9 @@ function actualizarEstado(db: Incidente[]): void {
     const estados = ['abierto', 'en progreso', 'resuelto'];
     
     reporte.estado = estados[parseInt(tecla) - 1] as any;
-    guardarDB(db);
+    guardarDB(db); // Actualiza la persistencia
     console.log("\nEstado actualizado a: " + reporte.estado.toUpperCase());
 }
 
+// Punto de entrada del programa
 menuPrincipal();
