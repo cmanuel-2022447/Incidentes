@@ -1,7 +1,5 @@
-# Generate the updated README.md code block for the user to copy
-readme_code = """# Sistema de Gestion de Incidentes
+#  Sistema de Gestion de Incidentes
 
-Aplicacion de consola (CLI) desarrollada en TypeScript para la gestion, seguimiento y actualizacion de reportes de incidentes tecnicos de forma eficiente.
 
 ## Tecnologias Utilizadas
 * **TypeScript:** Lenguaje base con tipado estatico.
