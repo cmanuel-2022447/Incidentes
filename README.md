@@ -28,3 +28,6 @@ La aplicacion opera como una interfaz de consola interactiva gestionando los dat
    ```bash
    git clone <URL_DEL_REPOSITORIO>
    cd Incidentes
+
+## Diagrama del problema
+<img width="1300" height="1600" alt="Analicis_del_proyecto_Diagrama_De_Flujo" src="https://github.com/user-attachments/assets/cf40babe-7656-422e-a638-dccdb96c6485" />
